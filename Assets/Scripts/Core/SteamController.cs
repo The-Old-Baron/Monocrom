@@ -11,10 +11,13 @@ public class SteamController : MonoBehaviour
 
     private void Start()
     {
-        steamID = SteamUser.GetSteamID().ToString();
-        steamName = SteamFriends.GetPersonaName();
-        int avatarInt = SteamFriends.GetLargeFriendAvatar(SteamUser.GetSteamID());
-        steamAvatar = GetSteamImageAsTexture(avatarInt);
+        if (SteamManager.Initialized)
+        {
+            steamID = SteamUser.GetSteamID().ToString();
+            steamName = SteamFriends.GetPersonaName();
+            int avatarInt = SteamFriends.GetLargeFriendAvatar(SteamUser.GetSteamID());
+            steamAvatar = GetSteamImageAsTexture(avatarInt);
+        }
     }
 
     private Texture2D GetSteamImageAsTexture(int image)

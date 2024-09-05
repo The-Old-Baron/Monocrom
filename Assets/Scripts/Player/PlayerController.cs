@@ -6,16 +6,18 @@ public class PlayerController : Entity
 {
     public Rigidbody2D rg;
     public Animation anim;
+    public Collider2D playerCollider;
 
     public float walkSpeed;
     public float runSpeed;
     public float jumpForce;
     public float fallMultiplier;
     public float wallJumpForce;
-
+    public bool isOnPlatform;
     public bool isGrounded;
     public bool isWalled;
     public bool isJumping;
+    public bool isJumpingDown;
     public bool isRunning;
     public bool isWallJumping;
     public bool isDoubleJumping;
@@ -32,7 +34,8 @@ public class PlayerController : Entity
     private void Start()
     {
         rg = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animation>();
+        // anim = GetComponent<Animation>();
+        playerCollider = GetComponent<Collider2D>();
     }
 
     private void Update()
@@ -42,6 +45,13 @@ public class PlayerController : Entity
         if (isGrounded)
         {
             isDoubleJumping = false;
+        }
+
+        if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+        {
+            
+            StartCoroutine(JumpDown());
+            return;
         }
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
@@ -61,6 +71,21 @@ public class PlayerController : Entity
         }
     }
 
+    private IEnumerator JumpDown()
+    {
+        // Se não estiver no chão
+        if (!isGrounded) yield break;
+        // Se não estiver em cima de uma plataforma
+        if(!isOnPlatform) yield break;
+        Debug.Log("JUMP DOWN");
+        isJumpingDown = true;
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Platform"), true);
+        yield return new WaitForSeconds(0.5f);
+        isJumpingDown = false;
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Platform"), false);
+
+    }
+
     private void FixedUpdate()
     {
         if (isGrounded)
@@ -75,7 +100,15 @@ public class PlayerController : Entity
         }
         else
         {
-            rg.gravityScale = 1;
+            if (isJumpingDown)
+            {
+                rg.gravityScale = 3;    
+            }
+            else
+            {
+                rg.gravityScale =  1 *  fallMultiplier;    
+            }
+            
         }
         if (isWalled && !isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
@@ -106,7 +139,7 @@ public class PlayerController : Entity
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
 
-        anim.Play("Walk");
+        // anim.Play("Walk");
     }
 
     private void Run()
@@ -123,7 +156,7 @@ public class PlayerController : Entity
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
 
-        anim.Play("Run");
+        // anim.Play("Run");
     }
 
     private void Jump()
@@ -150,6 +183,12 @@ public class PlayerController : Entity
         {
             isGrounded = true;
         }
+
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
+        {
+            isOnPlatform = true;
+        }
+         
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -157,6 +196,10 @@ public class PlayerController : Entity
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
+        }
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
+        {
+            isOnPlatform = false;
         }
     }
 

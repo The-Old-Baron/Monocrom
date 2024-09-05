@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class PlayerController : Entity
 {
     public Rigidbody2D rg;
     public Animation anim;
-    public Collider2D playerCollider;
+    public BoxCollider2D playerCollider;
+    
 
     public float walkSpeed;
     public float runSpeed;
@@ -21,6 +23,7 @@ public class PlayerController : Entity
     public bool isRunning;
     public bool isWallJumping;
     public bool isDoubleJumping;
+    public bool isChrouching;
 
     public Transform groundCheck;
     public Transform wallCheck;
@@ -30,12 +33,34 @@ public class PlayerController : Entity
 
     public float groundCheckRadius;
     public float wallCheckDistance;
-
+    
+    private Vector2 crouchSize;
+    private Vector2 crouchOffset;
+    
+    private Vector2 originalSize;
+    private Vector2 originalOffset;
+    
+    
+    // Essas 2 variaveis abaixo é só pra ver o cubo "agachando", quando for o sprite mesmo a gente usa o sprite agachando
+    private Vector3 originalScale;
+    private Vector3 crouchScale;
+    
     private void Start()
     {
         rg = GetComponent<Rigidbody2D>();
         // anim = GetComponent<Animation>();
-        playerCollider = GetComponent<Collider2D>();
+        playerCollider = GetComponent<BoxCollider2D>();
+
+        originalOffset = playerCollider.offset;
+        originalSize = playerCollider.size;
+        
+        
+        crouchSize = new Vector2(originalSize.x, originalSize.y / 2);
+        crouchOffset = new Vector2(originalOffset.x, originalSize.y / 2);
+
+
+        originalScale = transform.localScale;
+        crouchScale = new Vector3(originalScale.x, originalScale.y / 2, originalScale.z);
     }
 
     private void Update()
@@ -47,11 +72,21 @@ public class PlayerController : Entity
             isDoubleJumping = false;
         }
 
-        if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.S))
         {
-            
-            StartCoroutine(JumpDown());
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StartCoroutine(JumpDown());
+                return;    
+            }
+            Crouch();
             return;
+        }
+
+        if (isChrouching)
+        {
+            Standup();            
         }
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
@@ -69,6 +104,25 @@ public class PlayerController : Entity
         {
             isRunning = false;
         }
+    }
+
+    private void Crouch()
+    {
+        // Em tese essas 4 linhas vão funcionar quando tivermos um sprite de agachamento
+        // O size reduz o tamanho do colisor e o offset acredito que não vai precisar
+        // mas de todo modo vou deixar ele comentado por que pode ser que ajude
+        isChrouching = true;
+        transform.localScale = crouchScale;
+        // playerCollider.size = crouchScale;
+        // playerCollider.offset = new Vector2(0,-0.25f);
+    }
+
+    private void Standup()
+    {
+        isChrouching = false;
+        transform.localScale = originalScale;
+        playerCollider.size = originalSize;
+        playerCollider.offset = originalOffset;
     }
 
     private IEnumerator JumpDown()

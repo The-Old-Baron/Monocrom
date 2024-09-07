@@ -135,8 +135,9 @@ public class PlayerController : Entity
         if(!isOnPlatform) yield break;
         Debug.Log("JUMP DOWN");
         isJumpingDown = true;
+        // A ideia aqui é desligar e ligar a colisão por alguns milisegundos
         Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), true);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
         isJumpingDown = false;
         Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), false);
 
@@ -156,7 +157,7 @@ public class PlayerController : Entity
         }
         if (isJumpingDown)
         {
-            rg.gravityScale = 3;    
+            rg.gravityScale = 4;    
         }
 
         if (isJumping)
@@ -242,6 +243,7 @@ public class PlayerController : Entity
 
         if (collision.gameObject.CompareTag("Platform"))
         {
+            isGrounded = true;
             isOnPlatform = true;
             isJumping = false;
             isDoubleJumping = false;
@@ -258,6 +260,7 @@ public class PlayerController : Entity
         }
         if (collision.gameObject.CompareTag("Platform"))
         {
+            isGrounded = false;
             isOnPlatform = false;
         }
     }

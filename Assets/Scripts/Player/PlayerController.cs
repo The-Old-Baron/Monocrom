@@ -65,7 +65,9 @@ public class PlayerController : Entity
 
     private void Update()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        
+        // isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);    
+        
         isWalled = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, wallLayer);
         if (isGrounded)
         {
@@ -88,11 +90,11 @@ public class PlayerController : Entity
         {
             Standup();            
         }
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isOnPlatform))
         {
             Jump();
         }
-        if (Input.GetKeyDown(KeyCode.Space) && !isGrounded && !isDoubleJumping)
+        if (Input.GetKeyDown(KeyCode.Space) && isJumping && (!isGrounded && !isOnPlatform) && !isDoubleJumping)
         {
             DoubleJump();
         }
@@ -133,36 +135,33 @@ public class PlayerController : Entity
         if(!isOnPlatform) yield break;
         Debug.Log("JUMP DOWN");
         isJumpingDown = true;
-        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Platform"), true);
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), true);
         yield return new WaitForSeconds(0.5f);
         isJumpingDown = false;
-        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Platform"), false);
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), false);
 
     }
 
     private void FixedUpdate()
     {
-        if (isGrounded)
+        if (isGrounded && !isJumping)
         {
-            isJumping = false;
-            isWallJumping = false;
+            
+            rg.gravityScale = 1;
         }
         if (isWalled && !isGrounded && rg.velocity.y < 0)
         {
             rg.gravityScale = 0;
             rg.velocity = new Vector2(rg.velocity.x, -0.5f);
         }
-        else
+        if (isJumpingDown)
         {
-            if (isJumpingDown)
-            {
-                rg.gravityScale = 3;    
-            }
-            else
-            {
-                rg.gravityScale =  1 *  fallMultiplier;    
-            }
-            
+            rg.gravityScale = 3;    
+        }
+
+        if (isJumping)
+        {
+            rg.gravityScale =  1 * fallMultiplier;
         }
         if (isWalled && !isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
@@ -236,11 +235,17 @@ public class PlayerController : Entity
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            isJumping = false;
+            isDoubleJumping = false;
+            isWallJumping = false;
         }
 
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
+        if (collision.gameObject.CompareTag("Platform"))
         {
             isOnPlatform = true;
+            isJumping = false;
+            isDoubleJumping = false;
+            isWallJumping = false;
         }
          
     }
@@ -251,7 +256,7 @@ public class PlayerController : Entity
         {
             isGrounded = false;
         }
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
+        if (collision.gameObject.CompareTag("Platform"))
         {
             isOnPlatform = false;
         }

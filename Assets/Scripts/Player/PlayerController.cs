@@ -11,6 +11,14 @@ public class PlayerController : Entity
     
 
     public float walkSpeed;
+    [Tooltip("Velocidade aplicada durante o dash.")]
+    public float dashSpeed;
+    [Tooltip("Duração do dash em segundos.")]
+    public float dashDuration;
+    [Tooltip("Tempo de recarga em segundos antes que o dash possa ser usado novamente.")]
+    public float dashCooldown;
+    [Tooltip("Janela de tempo para detectar um duplo toque na mesma tecla.")]
+    public float doubleTapTimeWindow = 0.2f;
     public float runSpeed;
     public float jumpForce;
     public float fallMultiplier;
@@ -18,12 +26,23 @@ public class PlayerController : Entity
     public bool isOnPlatform;
     public bool isGrounded;
     public bool isWalled;
+    public bool isDashing;
     public bool isJumping;
     public bool isJumpingDown;
     public bool isRunning;
     public bool isWallJumping;
     public bool isDoubleJumping;
     public bool isChrouching;
+
+    private float lastDashTime = -10f;
+    // Variáveis para detectar duplo toque
+    private float lastTapTimeD;
+    private float lastTapTimeA;
+
+    public float dashTime;
+    public float dashCooldownTime;
+    
+    
 
     public Transform groundCheck;
     public Transform wallCheck;
@@ -44,7 +63,7 @@ public class PlayerController : Entity
     // Essas 2 variaveis abaixo é só pra ver o cubo "agachando", quando for o sprite mesmo a gente usa o sprite agachando
     private Vector3 originalScale;
     private Vector3 crouchScale;
-    
+    private Vector2 movement;
     private void Start()
     {
         rg = GetComponent<Rigidbody2D>();
@@ -80,9 +99,11 @@ public class PlayerController : Entity
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 StartCoroutine(JumpDown());
-                return;    
             }
-            Crouch();
+            else
+            {
+                Crouch();    
+            }
             return;
         }
 
@@ -90,6 +111,9 @@ public class PlayerController : Entity
         {
             Standup();            
         }
+
+        DetectDash();
+
         if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isOnPlatform))
         {
             Jump();
@@ -105,6 +129,38 @@ public class PlayerController : Entity
         else
         {
             isRunning = false;
+        }
+    }
+
+    private void DetectDash()
+    {
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (Time.time - lastTapTimeD < doubleTapTimeWindow && !isDashing && Time.time >= dashCooldownTime)
+            {
+                Debug.Log("Dashing Right");
+                Dash(Vector2.right);
+            }
+            lastTapTimeD = Time.time;
+        }
+
+        // Detecta duplo toque na tecla "A"
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (Time.time - lastTapTimeA < doubleTapTimeWindow && !isDashing && Time.time >= dashCooldownTime)
+            {
+                Debug.Log("Dashing Left");
+                Dash(Vector2.left);
+            }
+            lastTapTimeA = Time.time;
+        }
+
+        if (isDashing)
+        {
+            if (Time.time >= dashTime)
+            {
+                EndDash();
+            }
         }
     }
 
@@ -174,7 +230,10 @@ public class PlayerController : Entity
         }
         else
         {
-            Walk();
+            if (!isDashing)
+            {
+                Walk();    
+            }
         }
     }
 
@@ -194,6 +253,21 @@ public class PlayerController : Entity
         }
 
         // anim.Play("Walk");
+    }
+
+    private void Dash(Vector2 direction)
+    {
+        isDashing = true;
+        dashTime = Time.time + dashDuration;
+        dashCooldown = Time.time + dashCooldown;
+
+        rg.velocity = direction * dashSpeed;
+    }
+
+    void EndDash()
+    {
+        isDashing = false;
+        rg.velocity = Vector2.zero;
     }
 
     private void Run()

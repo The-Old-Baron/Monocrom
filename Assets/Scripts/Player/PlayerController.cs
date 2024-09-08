@@ -85,7 +85,7 @@ public class PlayerController : Entity
     private void Update()
     {
         
-        // isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);    
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);    
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
         isWalled = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, wallLayer);
@@ -342,7 +342,7 @@ public class PlayerController : Entity
         }
         if (collision.gameObject.CompareTag("Platform"))
         {
-            isGrounded = false;
+            // isGrounded = false;
             isOnPlatform = false;
         }
     }

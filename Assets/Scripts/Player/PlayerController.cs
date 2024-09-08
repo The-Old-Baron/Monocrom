@@ -86,7 +86,8 @@ public class PlayerController : Entity
     {
         
         // isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);    
-        
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
         isWalled = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, wallLayer);
         if (isGrounded)
         {
@@ -157,7 +158,8 @@ public class PlayerController : Entity
 
         if (isDashing)
         {
-            if (Time.time >= dashTime)
+            // Se o player apertar na direção oposta ao movimento do dash, cancela o mesmo
+            if ((Input.GetKey(KeyCode.A) && rg.velocity.x > 0) || (Input.GetKey(KeyCode.D) && rg.velocity.x < 0) || Time.time >= dashTime)
             {
                 EndDash();
             }
@@ -268,6 +270,12 @@ public class PlayerController : Entity
     {
         isDashing = false;
         rg.velocity = Vector2.zero;
+
+        // Faz com que o jogador continue caminhando caso o player esteja apertando algum botão de movimento
+        if (movement.x != 0)
+        {
+            rg.velocity = new Vector2(movement.x * walkSpeed, rg.velocity.y);
+        }
     }
 
     private void Run()

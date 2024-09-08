@@ -837,11 +837,11 @@ PrefabInstance:
       objectReference: {fileID: 1673037559}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: dashCooldown
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: dashDuration
-      value: 1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: isJumpingDown

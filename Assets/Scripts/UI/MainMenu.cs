@@ -2,47 +2,54 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
-    public GameObject PanelInicial;
-    public GameObject Jogar;
+    public GameObject Initial;
+    public GameObject DLC;
     public GameObject Configuracao;
-    public GameObject Extras;
+    public GameObject Creditos;
+    public GameObject Programacao;
+    public GameObject Conquistas;
 
     private void Start()
     {
-        ShowPanel(PanelInicial);
+        ShowInitial();
     }
-    
-    private void ShowPanel(GameObject panel)
+    public void ShowDLC()
     {
         HideAll();
-        panel.SetActive(true);
+        DLC.SetActive(true);
     }
-
-    private void HideAll()
-    {
-        PanelInicial.SetActive(false);
-        Jogar.SetActive(false);
-        Configuracao.SetActive(false);
-        Extras.SetActive(false);
-    }
-
-    public void ShowJogar()
-    {
-        ShowPanel(Jogar);
-    }
-
     public void ShowConfiguracao()
     {
-        ShowPanel(Configuracao);
+        HideAll();
+        Configuracao.SetActive(true);
     }
-
-    public void ShowExtras()
+    public void ShowCreditos()
     {
-        ShowPanel(Extras);
+        HideAll();
+        Creditos.SetActive(true);
     }
-
-    public void ShowPanelInicial()
+    public void ShowProgramacao()
     {
-        ShowPanel(PanelInicial);
+        HideAll();
+        Programacao.SetActive(true);
+    }
+    public void ShowConquistas()
+    {
+        HideAll();
+        Conquistas.SetActive(true);
+    }
+    public void ShowInitial()
+    {
+        HideAll();
+        Initial.SetActive(true);
+    }
+    public void HideAll()
+    {
+        Initial.SetActive(false);
+        DLC.SetActive(false);
+        Configuracao.SetActive(false);
+        Creditos.SetActive(false);
+        Programacao.SetActive(false);
+        Conquistas.SetActive(false);
     }
 }

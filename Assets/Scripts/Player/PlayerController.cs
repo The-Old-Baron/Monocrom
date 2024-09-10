@@ -64,9 +64,12 @@ public class PlayerController : Entity
     private Vector3 originalScale;
     private Vector3 crouchScale;
     private Vector2 movement;
+
+    public DirectionMove directionMovement;
     private void Start()
     {
         rg = GetComponent<Rigidbody2D>();
+        directionMovement = DirectionMove.Right;
         // anim = GetComponent<Animation>();
         playerCollider = GetComponent<BoxCollider2D>();
 
@@ -203,6 +206,12 @@ public class PlayerController : Entity
 
     private void FixedUpdate()
     {
+        if (movement.x > 0) {
+            directionMovement = DirectionMove.Right;
+        } else if (movement.x < 0) {
+            directionMovement = DirectionMove.Left;
+        }
+
         if (isGrounded && !isJumping)
         {
             
@@ -244,16 +253,6 @@ public class PlayerController : Entity
         float move = Input.GetAxis("Horizontal");
         rg.velocity = new Vector2(move * walkSpeed, rg.velocity.y);
         rg.velocity.Normalize();
-
-        if(move > 0)
-        {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-        }
-        else if (move < 0)
-        {
-            transform.eulerAngles = new Vector3(0, 180, 0);
-        }
-
         // anim.Play("Walk");
     }
 
@@ -282,15 +281,6 @@ public class PlayerController : Entity
     {
         float move = Input.GetAxis("Horizontal");
         rg.velocity = new Vector2(move * runSpeed, rg.velocity.y);
-
-        if (move > 0)
-        {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-        }
-        else if(move < 0)
-        {
-            transform.eulerAngles = new Vector3(0, 180, 0);
-        }
 
         // anim.Play("Run");
     }

@@ -2,21 +2,35 @@ using UnityEngine;
 
 public class PlayerAttackCollider : MonoBehaviour
 {
-    [SerializeField] private Transform AttackPoint;
+    [SerializeField] private Transform AttackPointRight;
+    [SerializeField] private Transform AttackPointLeft;
     [SerializeField] private float RayAtk;
     [SerializeField] LayerMask LayerEnemy;
 
-    //Método de deburação para visualizar a área de ataque
+    [SerializeField] PlayerController PlayerControls;
+
+    //Método de depuração para visualizar a área de ataque
     private void OnDrawGizmos() {
-        if(this.AttackPoint != null) {
-            Gizmos.DrawWireSphere(this.AttackPoint.position, this.RayAtk);
+        if(AttackPointRight != null && PlayerControls.directionMovement == DirectionMove.Right) {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(AttackPointRight.position, RayAtk);
+        } 
+        else
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(AttackPointLeft.position, RayAtk);
         }
     }
 
     private void Attack() {
-        Collider2D CollEnemy = Physics2D.OverlapCircle(this.AttackPoint.position, this.RayAtk, this.LayerEnemy);
-        if(CollEnemy != null) {
-            // Lógica para tirar dano dos inimigos
+        Transform AttackPoint = (PlayerControls.directionMovement == DirectionMove.Right) ? AttackPointRight : AttackPointLeft;
+
+        Collider2D[] CollEnemy = Physics2D.OverlapCircleAll(AttackPoint.position, RayAtk, LayerEnemy);
+        foreach (Collider2D ColliderEnemy in CollEnemy)
+        {
+            if(CollEnemy != null) {
+                print($"Enemy {ColliderEnemy}"); // Lógica de dano
+            }
         }
     }
 }

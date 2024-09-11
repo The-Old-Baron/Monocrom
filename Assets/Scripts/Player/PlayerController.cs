@@ -91,10 +91,35 @@ public class PlayerController : Entity
     private void Update()
     {
         
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);    
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        
+        // Raycast para a esquerda e direita
+        bool isTouchingWallLeft = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, wallLayer);
+        bool isTouchingWallRight = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, wallLayer);
+
+        Debug.Log($"touching left: {isTouchingWallLeft} | touching right: {isTouchingWallRight} ");
+        // Verifica se está encostando na parede
+        if (isTouchingWallLeft || isTouchingWallRight)
+        {
+            isWalled = true;
+            if (directionMovement == DirectionMove.Left)
+            {
+                animator.Play("WallSlideLeft");
+            }
+            else
+            {
+                animator.Play("WallSlideRight");
+            }
+
+            rg.gravityScale = 0;
+        }
+        else
+        {
+            rg.gravityScale = 1;
+            isWalled = false;
+        }
         _movement.x = Input.GetAxisRaw("Horizontal");
         _movement.y = Input.GetAxisRaw("Vertical");
-        isWalled = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, wallLayer);
         if (isGrounded)
         {
             isDoubleJumping = false;

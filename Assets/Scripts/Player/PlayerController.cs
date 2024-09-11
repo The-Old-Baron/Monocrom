@@ -129,18 +129,13 @@ public class PlayerController : Entity
         {
             DoubleJump();
         }
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && (_movement.x > 0 || _movement.x < 0) )
         {
             isRunning = true;
         }
         else
         {
             isRunning = false;
-        }
-
-        if (_movement.x == 0)
-        {
-            animator.Play("Idle");
         }
     }
 
@@ -221,6 +216,9 @@ public class PlayerController : Entity
         } else if (_movement.x < 0) {
             directionMovement = DirectionMove.Left;
             _spriteRenderer.flipX = true;
+        } else if (_movement.x == 0)
+        {
+            animator.Play("Idle");
         }
 
         if (isGrounded && !isJumping)

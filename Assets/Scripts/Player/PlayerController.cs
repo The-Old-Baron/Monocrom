@@ -109,11 +109,14 @@ public class PlayerController : Entity
         isWalled = isTouchingWallLeft || isTouchingWallRight;
         if (isWalled)
         {
+            _spriteRenderer.flipX = false;
             switch (directionMovement)
-            {
+            { 
+                    
                 case DirectionMove.Right:
                     if(animator.GetCurrentAnimatorStateInfo(0).IsName("WallSlideRight"))
                         return;
+                    
                     animator.Play("WallSlideRight");
                     Debug.Log("Wall Slide direita");
                     break;
@@ -249,11 +252,18 @@ public class PlayerController : Entity
         {
             case > 0:
                 directionMovement = DirectionMove.Right;
-                _spriteRenderer.flipX = false;
+                if (!isWalled)
+                {
+                    _spriteRenderer.flipX = false;                    
+                }
                 break;
             case < 0:
                 directionMovement = DirectionMove.Left;
-                _spriteRenderer.flipX = true;
+                if (!isWalled)
+                {
+                    _spriteRenderer.flipX = true;    
+                }
+                
                 break;
         }
 

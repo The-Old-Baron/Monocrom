@@ -825,6 +825,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 982639758194027362, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_Size.x
+      value: 0.638824
+      objectReference: {fileID: 0}
+    - target: {fileID: 982639758194027362, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.014993906
+      objectReference: {fileID: 0}
     - target: {fileID: 1685401605305902693, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -847,7 +855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: wallCheckDistance
-      value: 0.5
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: doubleTapTimeWindow
@@ -866,8 +874,24 @@ PrefabInstance:
       value: 0.6641808
       objectReference: {fileID: 0}
     - target: {fileID: 4652126099897010554, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.73652065
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652126099897010554, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.0161
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652126099897010554, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0946
+      objectReference: {fileID: 0}
+    - target: {fileID: 8302240412718607090, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_Size.x
+      value: 0.63634825
+      objectReference: {fileID: 0}
+    - target: {fileID: 8302240412718607090, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.016231775
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

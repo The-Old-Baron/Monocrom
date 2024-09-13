@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -91,35 +92,45 @@ public class PlayerController : Entity
     private void Update()
     {
         
+        _movement.x = Input.GetAxis("Horizontal");
+        _movement.y = Input.GetAxis("Vertical");
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         
         // Raycast para a esquerda e direita
-        bool isTouchingWallLeft = Physics2D.Raycast(transform.position, Vector2.left, wallCheckDistance, wallLayer);
-        bool isTouchingWallRight = Physics2D.Raycast(transform.position, Vector2.right, wallCheckDistance, wallLayer);
-
-        Debug.Log($"touching left: {isTouchingWallLeft} | touching right: {isTouchingWallRight} ");
-        // Verifica se está encostando na parede
-        if (isTouchingWallLeft || isTouchingWallRight)
+        
+        bool isTouchingWallRight = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance, wallLayer);
+        bool isTouchingWallLeft = false;
+        // Pra evitar ficar lançando raycast, só vai ver se ele esta tocando em uma parede na esquerda caso não tenha detectado 
+        // colisão na direita, ja que acredito eu que vão ter mais colisões pra direita do que pra esquerda
+        if (!isTouchingWallRight)
         {
-            isWalled = true;
-            if (directionMovement == DirectionMove.Left)
+            isTouchingWallLeft = Physics2D.Raycast(wallCheck.position, Vector2.left, wallCheckDistance, wallLayer);    
+        }
+        isWalled = isTouchingWallLeft || isTouchingWallRight;
+        if (isWalled)
+        {
+            switch (directionMovement)
             {
-                animator.Play("WallSlideLeft");
-            }
-            else
-            {
-                animator.Play("WallSlideRight");
-            }
-
-            rg.gravityScale = 0;
+                case DirectionMove.Right:
+                    if(animator.GetCurrentAnimatorStateInfo(0).IsName("WallSlideRight"))
+                        return;
+                    animator.Play("WallSlideRight");
+                    Debug.Log("Wall Slide direita");
+                    break;
+                case DirectionMove.Left:
+                    if(animator.GetCurrentAnimatorStateInfo(0).IsName("WallSlideLeft"))
+                        return;
+                    animator.Play("WallSlideLeft");
+                    Debug.Log("Wall Slide esquerda");
+                    break;
+            }       
         }
         else
         {
             rg.gravityScale = 1;
             isWalled = false;
         }
-        _movement.x = Input.GetAxisRaw("Horizontal");
-        _movement.y = Input.GetAxisRaw("Vertical");
+        
         if (isGrounded)
         {
             isDoubleJumping = false;
@@ -154,7 +165,7 @@ public class PlayerController : Entity
         {
             DoubleJump();
         }
-        if (Input.GetKey(KeyCode.LeftShift) && (_movement.x > 0 || _movement.x < 0) )
+        if (Input.GetKey(KeyCode.LeftShift) && _movement.x is > 0 or < 0 )
         {
             isRunning = true;
         }
@@ -234,26 +245,25 @@ public class PlayerController : Entity
 
     private void FixedUpdate()
     { 
-        if (_movement.x > 0) {
-            directionMovement = DirectionMove.Right;
-            _spriteRenderer.flipX = false;
-
-        } else if (_movement.x < 0) {
-            directionMovement = DirectionMove.Left;
-            _spriteRenderer.flipX = true;
-        } else if (_movement.x == 0)
+        switch (_movement.x)
         {
-            animator.Play("Idle");
+            case > 0:
+                directionMovement = DirectionMove.Right;
+                _spriteRenderer.flipX = false;
+                break;
+            case < 0:
+                directionMovement = DirectionMove.Left;
+                _spriteRenderer.flipX = true;
+                break;
         }
 
         if (isGrounded && !isJumping)
         {
-            
             rg.gravityScale = 1;
         }
         if (isWalled && !isGrounded && rg.velocity.y < 0)
         {
-            rg.gravityScale = 0;
+            rg.gravityScale = 3f;
             rg.velocity = new Vector2(rg.velocity.x, -0.5f);
         }
         if (isJumpingDown)
@@ -284,10 +294,30 @@ public class PlayerController : Entity
 
     private void Walk()
     {
+        
         float move = Input.GetAxis("Horizontal");
+        if (move == 0)
+        {
+            if (isJumping || isDashing || isDoubleJumping || isWalled)
+            {
+                return;
+            }
+            Debug.Log("Idling");
+            animator.Play("Idle");
+            return;
+        }
+        
+        Debug.Log("Walking");
         rg.velocity = new Vector2(move * walkSpeed, rg.velocity.y);
         rg.velocity.Normalize();
-        // anim.Play("Walk");
+        Debug.Log($"Speed: {animator.speed}");
+        // Não ativa a animação se o player estiver em algum desses estados
+        if (isJumping || isDashing || isDoubleJumping || isWalled)
+        {
+            return;
+        }
+        animator.speed = 0.8f;
+        animator.Play("Run");
     }
 
     private void Dash(Vector2 direction)
@@ -315,7 +345,8 @@ public class PlayerController : Entity
     {
         float move = Input.GetAxis("Horizontal");
         rg.velocity = new Vector2(move * runSpeed, rg.velocity.y);
-
+        Debug.Log("Running");
+        animator.speed = 1f;
         animator.Play("Run");
     }
 

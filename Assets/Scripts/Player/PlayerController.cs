@@ -107,7 +107,7 @@ public class PlayerController : Entity
         {
             isTouchingWallLeft = _colliderSystem.IsTouchingWall(wallCheck, Vector2.left);
         }
-        isWalled = isTouchingWallLeft || isTouchingWallRight;
+        isWalled = !isJumpingDown && (isTouchingWallLeft || isTouchingWallRight);
         if (isWalled)
         {
             _spriteRenderer.flipX = false;
@@ -161,14 +161,15 @@ public class PlayerController : Entity
 
         DetectDash();
 
-        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isOnPlatform || isWalled ))
-        {
-            Jump();
-        }
-        if (Input.GetKeyDown(KeyCode.Space) && isJumping && (!isGrounded && !isOnPlatform) && !isDoubleJumping)
+        if (Input.GetKeyDown(KeyCode.Space) && isJumping && !isDoubleJumping)
         {
             DoubleJump();
         }
+        if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
+        {
+            Jump();
+        }
+        
         if (Input.GetKey(KeyCode.LeftShift) && _movement.x is > 0 or < 0 )
         {
             isRunning = true;

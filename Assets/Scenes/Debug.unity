@@ -672,6 +672,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4652126099897010554, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
   m_PrefabInstance: {fileID: 908580178}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &214231193 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5394171088560800470, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+  m_PrefabInstance: {fileID: 908580178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &525083515
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,7 +764,7 @@ Transform:
   m_GameObject: {fileID: 525083515}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -781,6 +786,11 @@ MonoBehaviour:
   smoothSpeed: 0.125
   offset: {x: 0, y: 0, z: -10}
   rotation: {x: 0, y: 0, z: 0}
+--- !u!4 &805298905 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1777227734162057930, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+  m_PrefabInstance: {fileID: 908580178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &908580178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -862,6 +872,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 298283690, guid: 55d0710fffe8d7f498448e190baaeff1, type: 3}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: canLedge
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: runSpeed
       value: 10
       objectReference: {fileID: 0}
@@ -874,12 +888,48 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 67165864}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: isChrouching
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: climbDuration
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: LeftLedgeCheck
+      value: 
+      objectReference: {fileID: 214231193}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: isClimbingLedge
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: rightLedgeCheck
+      value: 
+      objectReference: {fileID: 805298905}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: wallLayer.m_Bits
       value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: climbOffsetLeft.x
+      value: -0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: climbOffsetLeft.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: wallCheckDistance
       value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: climbOffsetRight.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
+      propertyPath: climbOffsetRight.y
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 2596629364384898252, guid: 9c535c4ec5f993941a1a1f4e13928109, type: 3}
       propertyPath: doubleTapTimeWindow

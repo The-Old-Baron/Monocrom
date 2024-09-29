@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerController : Entity
 {
@@ -34,7 +35,14 @@ public class PlayerController : Entity
     public bool isWallJumping;
     public bool isDoubleJumping;
     public bool isChrouching;
+    [FormerlySerializedAs("isLedging")] public bool isClimbingLedge;
+    public bool canLedge;
     private ColliderSystem _colliderSystem;
+    private Vector2 ledgeDirection;
+    [SerializeField] private float climbDuration = 1.5f;
+    [SerializeField] private Vector2 climbOffsetRight = new Vector2(0.5f, 1.0f); // Offset para a direita
+    [SerializeField] private Vector2 climbOffsetLeft = new Vector2(-0.5f, 1.0f); // Offset para a esquerda
+
 
     
     // Variáveis para detectar duplo toque
@@ -49,9 +57,10 @@ public class PlayerController : Entity
 
     public Transform groundCheck;
     public Transform wallCheck;
-
-    public LayerMask groundLayer;
-    public LayerMask wallLayer;
+    
+    public Transform rightLedgeCheck;
+    public Transform LeftLedgeCheck;
+    
 
     public float groundCheckRadius;
     public float wallCheckDistance;
@@ -119,13 +128,11 @@ public class PlayerController : Entity
                         return;
                     
                     animator.Play("WallSlideRight");
-                    Debug.Log("Wall Slide direita");
                     break;
                 case DirectionMove.Left:
                     if(animator.GetCurrentAnimatorStateInfo(0).IsName("WallSlideLeft"))
                         return;
                     animator.Play("WallSlideLeft");
-                    Debug.Log("Wall Slide esquerda");
                     break;
             }       
         }
@@ -133,6 +140,7 @@ public class PlayerController : Entity
         {
             rg.gravityScale = 1;
             isWalled = false;
+            canLedge = false;
         }
         
         if (isGrounded)
@@ -161,14 +169,21 @@ public class PlayerController : Entity
 
         DetectDash();
 
+       
         if (Input.GetKeyDown(KeyCode.Space) && isJumping && !isDoubleJumping)
         {
+            Debug.Log("Double Jumping");
             DoubleJump();
         }
+
+        
         if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
         {
+            Debug.Log("Jumping");
             Jump();
         }
+       
+        
         
         if (Input.GetKey(KeyCode.LeftShift) && _movement.x is > 0 or < 0 )
         {
@@ -180,13 +195,55 @@ public class PlayerController : Entity
         }
     }
 
+    private bool CheckIfCanLedge(Vector2 direction)
+    {
+        bool canLedge = _colliderSystem.IsTouchingWall(wallCheck, direction);
+        if (canLedge)
+        {
+            ledgeDirection = direction;            
+        }
+        return canLedge;
+    }
+    IEnumerator ClimbLedge()
+    {
+        this.enabled = false;
+        isClimbingLedge = true;
+        rg.velocity = Vector2.zero;
+        rg.gravityScale = 0;
+        Vector3 targetPosition;
+        if (ledgeDirection == Vector2.right)
+        {
+            targetPosition = transform.position + (Vector3)climbOffsetRight;
+        }
+        else
+        {
+            targetPosition = transform.position + (Vector3)climbOffsetLeft;
+        }
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), true);
+        float elapsedTime = 0;
+        Debug.Log("Ledging");
+        animator.Play("LedgeClimb");
+        while (elapsedTime < climbDuration)
+        {
+            Vector3 newPosition  = Vector3.Lerp(transform.position, targetPosition, (elapsedTime / climbDuration));
+            rg.MovePosition(newPosition);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), false);
+        rg.velocity = Vector2.zero;
+        rg.gravityScale = 1;
+        animator.Play("Idle");
+        isClimbingLedge = false;
+        this.enabled = true;
+    }
+
     private void DetectDash()
     {
         if (Input.GetKeyDown(KeyCode.D))
         {
             if (Time.time - _lastTapTimeD < doubleTapTimeWindow && !isDashing && Time.time >= dashCooldownTime)
             {
-                Debug.Log("Dashing Right");
                 Dash(Vector2.right);
             }
             _lastTapTimeD = Time.time;
@@ -197,7 +254,6 @@ public class PlayerController : Entity
         {
             if (Time.time - _lastTapTimeA < doubleTapTimeWindow && !isDashing && Time.time >= dashCooldownTime)
             {
-                Debug.Log("Dashing Left");
                 Dash(Vector2.left);
             }
             _lastTapTimeA = Time.time;
@@ -238,7 +294,6 @@ public class PlayerController : Entity
         if (!isGrounded) yield break;
         // Se não estiver em cima de uma plataforma
         if(!isOnPlatform) yield break;
-        Debug.Log("JUMP DOWN");
         isJumpingDown = true;
         // A ideia aqui é desligar e ligar a colisão por alguns milisegundos
         Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Map"), true);
@@ -286,6 +341,18 @@ public class PlayerController : Entity
         if (isJumping)
         {
             rg.gravityScale =  1 * fallMultiplier;
+        } 
+        canLedge = CheckIfCanLedge(Vector2.right);
+        if (!canLedge) 
+        {
+            canLedge = CheckIfCanLedge(Vector2.left);            
+        }
+        Debug.Log($"Can Ledge: {canLedge}");
+        
+        if (canLedge && !isClimbingLedge && Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Ledge");
+            StartCoroutine(ClimbLedge());
         }
         if (isWalled && !isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
@@ -314,15 +381,12 @@ public class PlayerController : Entity
             {
                 return;
             }
-            Debug.Log("Idling");
             animator.Play("Idle");
             return;
         }
         
-        Debug.Log("Walking");
         rg.velocity = new Vector2(move * walkSpeed, rg.velocity.y);
         rg.velocity.Normalize();
-        Debug.Log($"Speed: {animator.speed}");
         // Não ativa a animação se o player estiver em algum desses estados
         if (isJumping || isDashing || isDoubleJumping || isWalled)
         {
@@ -357,7 +421,6 @@ public class PlayerController : Entity
     {
         float move = Input.GetAxis("Horizontal");
         rg.velocity = new Vector2(move * runSpeed, rg.velocity.y);
-        Debug.Log("Running");
         animator.speed = 1f;
         animator.Play("Run");
     }

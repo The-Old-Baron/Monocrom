@@ -34,6 +34,7 @@ public class PlayerController : Entity
     public bool isWallJumping;
     public bool isDoubleJumping;
     public bool isChrouching;
+    private ColliderSystem _colliderSystem;
 
     
     // Variáveis para detectar duplo toque
@@ -84,7 +85,7 @@ public class PlayerController : Entity
         _crouchSize = new Vector2(_originalSize.x, _originalSize.y / 2);
         _crouchOffset = new Vector2(_originalOffset.x, _originalSize.y / 2);
 
-
+        _colliderSystem = GetComponent<ColliderSystem>();
         _originalScale = transform.localScale;
         _crouchScale = new Vector3(_originalScale.x, _originalScale.y / 2, _originalScale.z);
     }
@@ -94,17 +95,17 @@ public class PlayerController : Entity
         
         _movement.x = Input.GetAxis("Horizontal");
         _movement.y = Input.GetAxis("Vertical");
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        isGrounded = _colliderSystem.IsGrounded(groundCheck);
         
         // Raycast para a esquerda e direita
         
-        bool isTouchingWallRight = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance, wallLayer);
+        bool isTouchingWallRight = _colliderSystem.IsTouchingWall(wallCheck, Vector2.right);
         bool isTouchingWallLeft = false;
         // Pra evitar ficar lançando raycast, só vai ver se ele esta tocando em uma parede na esquerda caso não tenha detectado 
         // colisão na direita, ja que acredito eu que vão ter mais colisões pra direita do que pra esquerda
         if (!isTouchingWallRight)
         {
-            isTouchingWallLeft = Physics2D.Raycast(wallCheck.position, Vector2.left, wallCheckDistance, wallLayer);    
+            isTouchingWallLeft = _colliderSystem.IsTouchingWall(wallCheck, Vector2.left);
         }
         isWalled = isTouchingWallLeft || isTouchingWallRight;
         if (isWalled)
@@ -160,7 +161,7 @@ public class PlayerController : Entity
 
         DetectDash();
 
-        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isOnPlatform))
+        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isOnPlatform || isWalled ))
         {
             Jump();
         }

@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 982639758194027362}
   - component: {fileID: 8302240412718607090}
   - component: {fileID: 1875736720118137602}
+  - component: {fileID: -5090944390562938607}
   m_Layer: 0
   m_Name: BonecoTeste
   m_TagString: Player
@@ -453,3 +454,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-5090944390562938607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3460883335219376663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f2296065cf72042b402ba6b7a7e36e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _whatIsGround:
+    serializedVersion: 2
+    m_Bits: 0
+  _groundCheckRadius: {x: 1, y: 1}
+  _whatIsWall:
+    serializedVersion: 2
+    m_Bits: 0
+  _whatIsCeiling:
+    serializedVersion: 2
+    m_Bits: 0
+  _whatIsEnemy:
+    serializedVersion: 2
+    m_Bits: 0

@@ -22,7 +22,7 @@ public class ColliderSystem : MonoBehaviour
     }
     public bool IsGrounded(Transform transform)
     {
-        return Physics2D.OverlapBox(transform.position, _groundCheckRadius, _whatIsGround);
+        return Physics2D.OverlapCircle(transform.position, _groundCheckRadius.y, _whatIsGround);
     }
 
     public bool IsTouchingWall(Transform transform, Vector2 direction)
